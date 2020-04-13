@@ -21,44 +21,103 @@ def detect_red_light(I):
 
     bounding_boxes = [] # This should be a list of lists, each of length 4. See format example below.
 
-    '''
-    BEGIN YOUR CODE
-    '''
+    # Best Algorithm
+    k = Image.open('redlight.jpg')
+    k = np.asarray(k)
+    k = k / np.linalg.norm(k)
+    box_height, box_width, _ = k.shape
 
-    '''
-    As an example, here's code that generates between 1 and 5 random boxes
-    of fixed size and returns the results in the proper format.
-    '''
-
-    box_height = 8
-    box_width = 6
-
-    num_boxes = np.random.randint(1,5)
-
-    for i in range(num_boxes):
-        (n_rows,n_cols,n_channels) = np.shape(I)
-
-        tl_row = np.random.randint(n_rows - box_height)
-        tl_col = np.random.randint(n_cols - box_width)
-        br_row = tl_row + box_height
-        br_col = tl_col + box_width
-
-        bounding_boxes.append([tl_row,tl_col,br_row,br_col])
-
-    '''
-    END YOUR CODE
-    '''
+    height, width, _ = I.shape
+    for i in range(height - box_height + 1):
+        for j in range(width - box_width + 1):
+            tmp = I[i:i+box_height, j:j+box_width, :]
+            tmp = tmp / np.linalg.norm(tmp)
+            val = np.sum(tmp * k)
+            #print(val)
+            if val > 0.9:
+                tl_row = i
+                tl_col = j
+                br_row = i+box_height
+                br_col = j+box_width
+                bounding_boxes.append([tl_row,tl_col,br_row,br_col])
 
     for i in range(len(bounding_boxes)):
         assert len(bounding_boxes[i]) == 4
 
     return bounding_boxes
 
+    # Algorithm 0
+    # k = np.zeros([6,8,3])
+    # k[0:2,2:5,:] = [255,0,0]
+    # k = k / np.linalg.norm(k)
+    # print(k)
+    # box_height, box_width, _ = k.shape
+    #
+    # height, width, _ = I.shape
+    # for i in range(height - box_height + 1):
+    #     for j in range(width - box_width + 1):
+    #         tmp = I[i:i+box_height, j:j+box_width, :]
+    #         tmp = tmp / np.linalg.norm(tmp)
+    #         val = np.sum(tmp * k)
+    #         print(val)
+    #         if val > 0.3:
+    #             tl_row = i
+    #             tl_col = j
+    #             br_row = i+box_height
+    #             br_col = j+box_width
+    #             bounding_boxes.append([tl_row,tl_col,br_row,br_col])
+
+    # Algorithm 1
+    # k = Image.open('redlight.jpg')
+    # k = np.asarray(k)
+    # k = k[:, :, 0]
+    # k = k / np.linalg.norm(k)
+    # print(k)
+    # box_height, box_width = k.shape
+    #
+    # height, width, _ = I.shape
+    # for i in range(height - box_height + 1):
+    #     for j in range(width - box_width + 1):
+    #         tmp = I[i:i+box_height, j:j+box_width, :]
+    #         tmp = tmp[:, :, 0]
+    #         tmp = tmp / np.linalg.norm(tmp)
+    #         val = np.sum(tmp * k)
+    #         print(val)
+    #         if val > 0.9:
+    #             tl_row = i
+    #             tl_col = j
+    #             br_row = i+box_height
+    #             br_col = j+box_width
+    #             bounding_boxes.append([tl_row,tl_col,br_row,br_col])
+
+    # # Algorithm 2
+    # k = Image.open('redlight.jpg')
+    # k = np.asarray(k)
+    # k = k[:, :, 0] * 0.5 + k[:, :, 1] * 0.1 + k[:, :, 2] * 0.4
+    # k = k / np.linalg.norm(k)
+    # box_height, box_width = k.shape
+    #
+    # height, width, _ = I.shape
+    # I = I[:,:,0] * 0.5 + I[:,:,1]*0.1 + I[:,:,2] * 0.4
+    # for i in range(height - box_height + 1):
+    #     for j in range(width - box_width + 1):
+    #         tmp = I[i:i+box_height, j:j+box_width]
+    #         tmp = tmp / np.linalg.norm(tmp)
+    #         val = np.sum(tmp * k)
+    #         #print(val)
+    #         if val > 0.9:
+    #             tl_row = i
+    #             tl_col = j
+    #             br_row = i+box_height
+    #             br_col = j+box_width
+    #             bounding_boxes.append([tl_row,tl_col,br_row,br_col])
+
+
 # set the path to the downloaded data:
 data_path = './data/RedLights2011_Medium'
 
 # set a path for saving predictions:
-preds_path = './data/hw01_preds' 
+preds_path = './data/hw01_preds'
 os.makedirs(preds_path,exist_ok=True) # create directory if needed
 
 # get sorted list of files:
@@ -69,7 +128,6 @@ file_names = [f for f in file_names if '.jpg' in f]
 
 preds = {}
 for i in range(len(file_names)):
-
     # read image using PIL:
     I = Image.open(os.path.join(data_path,file_names[i]))
 
