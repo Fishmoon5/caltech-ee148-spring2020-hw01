@@ -21,7 +21,7 @@ def detect_red_light(I):
 
     bounding_boxes = [] # This should be a list of lists, each of length 4. See format example below.
 
-    # Best Algorithm
+    # Best Algorithm (Algorithm 2)
     k = Image.open('redlight.jpg')
     k = np.asarray(k)
     k = k / np.linalg.norm(k)
@@ -46,7 +46,7 @@ def detect_red_light(I):
 
     return bounding_boxes
 
-    # Algorithm 0
+    # Algorithm 1
     # k = np.zeros([6,8,3])
     # k[0:2,2:5,:] = [255,0,0]
     # k = k / np.linalg.norm(k)
@@ -67,7 +67,7 @@ def detect_red_light(I):
     #             br_col = j+box_width
     #             bounding_boxes.append([tl_row,tl_col,br_row,br_col])
 
-    # Algorithm 1
+    # Algorithm 3
     # k = Image.open('redlight.jpg')
     # k = np.asarray(k)
     # k = k[:, :, 0]
@@ -90,7 +90,7 @@ def detect_red_light(I):
     #             br_col = j+box_width
     #             bounding_boxes.append([tl_row,tl_col,br_row,br_col])
 
-    # # Algorithm 2
+    # # Algorithm 4
     # k = Image.open('redlight.jpg')
     # k = np.asarray(k)
     # k = k[:, :, 0] * 0.5 + k[:, :, 1] * 0.1 + k[:, :, 2] * 0.4
